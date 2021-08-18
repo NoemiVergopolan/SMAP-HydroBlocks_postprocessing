@@ -71,8 +71,8 @@ minlon = -83.78
 maxlon = -83.51     
 
 # 4. Define dates of interest. It must be between 31 March 2015 and 31 December 2019 (SMAP retrieval dates)
-start_date = "2016-01-01"
-end_date = "2016-12-31"
+start_date = "2016-06-01"
+end_date = "2016-06-31"
 
 # Define compression level [0-9]. If ouput file is too big, increase compression
 compression_level = 9
