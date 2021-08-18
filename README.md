@@ -8,7 +8,7 @@ SMAP-HydroBlocks (SMAP-HB) is a hyper-resolution satellite-based surface soil mo
 4. Run: ```python ./SMAPHB_hru2grid.py```
 
 ### Notes
-SMAP-HydroBlocks is a very big dataset. If remaped entirely it comprises of 22TB of data in maximum compression (option 9) or 600 TB with no compression (option 0). This script allows for subsetting and postprocessing this dataset according to user's needs and resources. For example, SMAP-HydroBlocks at 30-meter 6-hour resolution at a 10-km by 10-km box extent over a 1 year period is expected to output 55 MB of data using maximum compression (option 9) or 1.5 GB of data with no compression (option 0). As such, please keep in mind that the domain extent, time period, and compression option selected will determine the output file size and running time.
+SMAP-HydroBlocks is a very big dataset. If remaped entirely it comprises of ~22 TB of data in maximum compression (option 9) or ~600 TB with no compression (option 0). This script allows for subsetting and postprocessing this dataset according to user's needs and resources. For example, SMAP-HydroBlocks at 30-meter 6-hour resolution at a 10-km by 10-km box extent over a 1 year period is expected to output 55 MB of data using maximum compression (option 9) or 1.5 GB of data with no compression (option 0). As such, please keep in mind that the domain extent, time period, and compression option selected will determine the output file size and running time.
 
 ### If you run out of memmory, please consider:
  - Reduce the domain extent
