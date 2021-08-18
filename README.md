@@ -1,5 +1,5 @@
 # Summary
-This script post-process the SMAP-HydroBlocks dataset from the Hydrological Response Unit (HRU) space into the geographically gridded space. The data output is at 30-m 6-h resolution, using a Plate Carrée projection and stored in netCDF4 format. The SMAP-HydroBlocks dataset reports the top 5-cm surface soil moisture in volumetric units (m3/m3).
+SMAP-HydroBlocks (SMAP-HB) is a hyper-resolution satellite-based surface soil moisture product that combines NASA's Soil Moisture Active-Passive (SMAP) L3 Enhance product, hyper-resolution land surface modeling, radiative transfer modeling, machine learning, and in-situ observations. This dataset was developed over the continental United States at 30-m 6-hourly resolution (2015–2019). This script post-process the SMAP-HydroBlocks dataset from the Hydrological Response Unit (HRU) space into the geographically gridded space. The data output is at 30-m 6-h resolution, using a Plate Carrée projection and stored in netCDF4 format. The SMAP-HydroBlocks dataset reports the top 5-cm surface soil moisture in volumetric units (m3/m3).
 
 # Usage
 1. Download the SMAP-HydroBlocks Database at X
