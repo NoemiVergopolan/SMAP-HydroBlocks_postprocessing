@@ -14,7 +14,7 @@
 #
 # Usage: 
 #   
-#      1. Download the SMAP-HydroBlocks Database at 
+#      1. Download the SMAP-HydroBlocks Database at https://doi.org/10.5281/zenodo.5206725
 #      2. Update database folder path, and desired data extent, period, compression level
 #      3. Run: python ./SMAPHB_hru2grid.py
 #
