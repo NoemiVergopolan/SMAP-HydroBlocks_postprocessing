@@ -4,7 +4,7 @@
 # Usage
 1. Download the SMAP-HydroBlocks Database at https://doi.org/10.5281/zenodo.5206725
 2. Update database folder path, desired data extent, period, compression level in the SMAPHB_hru2grid.py file
-3. Make sure to have installed python and the following libraries: numpy, xarray, rasterio, datetime
+3. Make sure to have installed python and the following libraries: numpy, netcdf4, xarray, rasterio, datetime
 4. Run: ```python ./SMAPHB_hru2grid.py```
 
 ### Notes
