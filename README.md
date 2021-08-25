@@ -12,7 +12,7 @@ cd SMAP-HydroBlocks_postprocessing
 
 2. Download the SMAP-HydroBlocks Database from https://doi.org/10.5281/zenodo.5206725 and unzip it
  ```
- wget https://zenodo.org/record/5206725/files/SMAP-HB_hru_6h.zip?download=1
+ wget https://zenodo.org/record/5206725/files/SMAP-HB_hru_6h.zip
  unzip SMAP-HB_hru_6h.zip
  ```
 
