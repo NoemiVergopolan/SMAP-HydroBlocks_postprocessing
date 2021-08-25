@@ -14,9 +14,10 @@
 #
 # Usage: 
 #   
-#      1. Download the SMAP-HydroBlocks Database (SMAP-HB_hru_6h.zip file) at https://doi.org/10.5281/zenodo.5206725
-#      2. Update database folder path, and desired data extent, period, compression level
+#      1. Download the SMAP-HydroBlocks Database: wget https://zenodo.org/record/5206725/files/SMAP-HB_hru_6h.zip
+#      2. Unzip the file: unzip SMAP-HB_hru_6h.zip
 #      3. Run: python ./SMAPHB_hru2grid.py
+#
 #
 # Note: 
 #      SMAP-HydroBlocks is a very big dataset. If remaped entirely it comprises of 22TB of data in 
