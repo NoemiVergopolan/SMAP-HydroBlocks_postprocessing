@@ -15,11 +15,11 @@ cd SMAP-HydroBlocks_postprocessing
  wget https://zenodo.org/record/5206725/files/SMAP-HB_hru_6h.zip
  unzip SMAP-HB_hru_6h.zip
  ```
-
-Edit the SMAPHB_hru2grid.py script to change the desired data extent, time period, or compression level, and run the script
+Run the script
 ```
 python ./SMAPHB_hru2grid.py
 ```
+Edit the SMAPHB_hru2grid.py script to change the desired data extent, time period, compression level, output file name, and database path.
 
 ### Notes
 SMAP-HydroBlocks is a very big dataset. If remapped entirely, it comprises ~22 TB of data in maximum compression (option 9) or ~600 TB with no compression (option 0). This script allows for subsetting and post-processing this dataset according to the user's needs and resources. For example, SMAP-HydroBlocks at 30-m 6-h resolution at a 10-km by 10-km box extent over one year will result in 55 MB of data using maximum compression (option 9) or 1.5 GB of data with no compression (option 0). As such, please keep in mind that the domain extent, time period, and compression option selected will determine the output file size and running time.
