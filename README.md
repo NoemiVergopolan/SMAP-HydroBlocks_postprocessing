@@ -15,7 +15,7 @@ cd SMAP-HydroBlocks_postprocessing
  wget https://zenodo.org/record/5206725/files/SMAP-HB_hru_6h.zip
  unzip SMAP-HB_hru_6h.zip
  ```
-Run the script
+3. Run the script
 ```
 python ./SMAPHB_hru2grid.py
 ```
