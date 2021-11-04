@@ -71,20 +71,22 @@ maxlat = 31.76
 minlon = -83.78 
 maxlon = -83.51     
 
-# 4. Define dates of interest. It must be between 31 March 2015 and 31 December 2019 (SMAP retrieval dates)
-start_date = "2016-06-01"
-end_date = "2016-06-30"
+# 4. Define dates of interest. It must be between 31 March 2015 and 31 December 2019 (SMAP-HB retrieval dates)
+start_date = "2016-01-01"
+end_date = "2016-12-31"
 
-# Define compression level [0-9]. If ouput file is too big, increase compression
+# 5. Define time agregation. Options are: '6h', 'daily', 'monthly', 'annual'
+time_step = '6h'
+
+# 6. Define compression level [0-9]. If ouput file is too big, increase compression
 compression_level = 9
 
-# 5. Output dataset
+# 7. Output dataset
 SMAPHB_functions.save_data(database_path, 
                            minlon, maxlon, minlat, maxlat, 
-                           start_date, end_date,
+                           start_date, end_date, time_step,
                            compression_level,
                            output_file
                           )
-
 
 
