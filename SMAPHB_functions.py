@@ -21,6 +21,7 @@ def save_data(database_path, minlon, maxlon, minlat, maxlat,
     # retrieve unique catchments ID
     unique_catchments = np.unique(catch_map.values)
     unique_catchments = unique_catchments[unique_catchments != -9999]
+    if len(unique_catchments) == 0: sys.exit('ERROR: Empty domain, double check your lat lon extents')
 
     # retrive lat lon
     lons = catch_map.x.values
@@ -65,6 +66,7 @@ def save_data(database_path, minlon, maxlon, minlat, maxlat,
     final_map_xr = xr.DataArray(new_data, coords=[times, lats, lons], dims=["time", "lat", "lon"])
     final_map_xr.attrs["units"]="m3/m3"
     ds = final_map_xr.to_dataset(name='SMAPHB_SM')
+    del new_data
 
     # Aggregate data in time according to the options: '6h', 'daily', 'monthly', 'annual'
     with warnings.catch_warnings():
