@@ -1,8 +1,7 @@
 # Summary
-[SMAP-HydroBlocks (SMAP-HB)](https://waterai.earth/smaphb/) is a hyper-resolution satellite-based surface soil moisture product that combines NASA's Soil Moisture Active-Passive (SMAP) L3 Enhance product, hyper-resolution land surface modeling, radiative transfer modeling, machine learning, and in-situ observations. This dataset was developed over the continental United States at 30-m 6-h resolution (2015–2019). This script post-process the SMAP-HydroBlocks dataset from the Hydrological Response Unit (HRU) space (time, hru) into the geographically gridded space (time, latitude, longitude). The data output is at the 30-m 6-h resolution, using a Plate Carrée projection, and stored in netCDF4 format. The SMAP-HydroBlocks dataset reports the top 5-cm surface soil moisture in volumetric units (m3/m3).
+[SMAP-HydroBlocks (SMAP-HB)](https://waterai.earth/smaphb/) is a hyper-resolution satellite-based surface soil moisture product that combines NASA's Soil Moisture Active-Passive (SMAP) L3 Enhance product, hyper-resolution land surface modeling, radiative transfer modeling, machine learning, and in-situ observations. This dataset reports the surface soil moisture (top 5-cm of the soil layer) in volumetric unit (m3/m3). Data is available across the continental United States at an effective 30-m spatial resolution (2015–2019). Retrievals are organized 6h, but are only reported at the time of SMAP retrieval. This script post-process the SMAP-HydroBlocks dataset from the Hydrological Response Unit (HRU) space (time, hru) into the geographically gridded space (time, latitude, longitude) using a Plate Carrée projection. Data can be output in Zarr and/or netCDF4 format. 
 
 # Usage
-Make sure to have installed python and the numpy, netcdf4, xarray, rasterio, and datetime libraries, and follow the steps:
 
 1. Clone this repository
 ```
@@ -15,20 +14,38 @@ cd SMAP-HydroBlocks_postprocessing
  wget https://zenodo.org/record/5206725/files/SMAP-HB_hru_6h.zip
  unzip SMAP-HB_hru_6h.zip
  ```
-3. Run the script
+
+3. Create an anaconda environment
+```
+conda env create --name mapping -f yml/github/environment.yml
+source activate mapping
+```
+
+4. Run the script
 ```
 python ./SMAPHB_hru2grid.py
 ```
-Edit the SMAPHB_hru2grid.py script to change the desired data extent, time period, compression level, output file name, and database path.
+
+Edit the SMAPHB_hru2grid.py script to change the desired spatial extent, time period, time resolution, compression level, output file name, and database path.
+
+
+
+### Support for MPI-Parallel via mpirun
+The remapping can be performed in a multi-core setup with ```mpi_run = True``` in SMAPHB_hru2grid.py.
+```
+mpirun -np <number of processes> python ./SMAPHB_hru2grid.py
+```
+
+
+### Support for coarser spatial resolution
+There is an experimental feature that allows remapping the SMAP-HydroBlocks data to a coarser spatial resolution than 30-m using the xESMF library. This, however, does not provide MPI support. To test remapping data to a coarse spatial resolution, please edit SMAPHB_hru2grid.py and set ```mpi_run = False``` and  ```final_spatial_resolution = <desire resolution in meters>``` then:
+```
+python ./SMAPHB_hru2grid.py
+```
 
 ### Notes
-SMAP-HydroBlocks is a very big dataset. If remapped entirely, it comprises ~22 TB of data in maximum compression (option 9) or ~600 TB with no compression (option 0). This script allows for subsetting and post-processing this dataset according to the user's needs and resources. For example, SMAP-HydroBlocks at 30-m 6-h resolution at a 10-km by 10-km box extent over one year will result in 55 MB of data using maximum compression (option 9) or 1.5 GB of data with no compression (option 0). As such, please keep in mind that the domain extent, time period, and compression option selected will determine the output file size and running time.
+SMAP-HydroBlocks is a very big dataset. If remapped entirely at a daily scale comprises ~120TB of data in maximum compression (option 9). This script allows for post-processing subsets of the dataset according to the user's needs and resources. For example, SMAP-HydroBlocks mapped to a 30-meter daily resolution, at ~ 50km x 50km domain, for a 1 year period, with maximum compression [option 9], is expected to output 786 MB of NetCDF files or 656 MB of Zarr storage. As such, please keep in mind that the domain extent, time period, temporal resolution, and compression option selected will determine runtime and data storage requirements.
 
-### If you run out of memory, please consider:
- - Reduce the domain extent
- - Reduce the time period
- - Perform data post-processing in batches
- - Deploy this script in an HPC system
 
 # Reference
 
