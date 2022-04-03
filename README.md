@@ -26,19 +26,19 @@ source activate mapping
 python ./SMAPHB_hru2grid.py
 ```
 
-Edit the SMAPHB_hru2grid.py script to change the desired spatial extent, time period, time resolution, compression level, output file name, and database path.
+Edit the ```SMAPHB_hru2grid.py``` script to change the desired spatial extent, time period, time resolution, data format, compression level, output file name, etc.
 
 
 
 ### Support for MPI-Parallel via mpirun
-The remapping can be performed in a multi-core setup with ```mpi_run = True``` in SMAPHB_hru2grid.py.
+The remapping can be performed in a multi-core setup with ```mpi_run = True``` in ```SMAPHB_hru2grid.py``` and run as:
 ```
 mpirun -np <number of processes> python ./SMAPHB_hru2grid.py
 ```
 
 
-### Support for coarser spatial resolution
-There is an experimental feature that allows remapping the SMAP-HydroBlocks data to a coarser spatial resolution than 30-m using the xESMF library. This, however, does not provide MPI support. To test remapping data to a coarse spatial resolution, please edit SMAPHB_hru2grid.py and set ```mpi_run = False``` and  ```final_spatial_resolution = <desire resolution in meters>``` then:
+### Support for remapping at coarser spatial resolutions
+There is an experimental feature that allows remapping the SMAP-HydroBlocks data to a coarser spatial resolution than its original 30-m resolution. This feature uses the python xESMF library, which does not provide MPI support. To remap SMAP-HydroBlocks to a coarse spatial resolution, please edit ```SMAPHB_hru2grid.py``` and set ```mpi_run = False``` and  ```final_spatial_resolution = <desire resolution in meters>```. Run the script as:
 ```
 python ./SMAPHB_hru2grid.py
 ```
