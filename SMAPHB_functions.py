@@ -117,7 +117,7 @@ def create_zarr_template(final_path, variable, lats, lons, final_spatial_resolut
     # Define atributes
     attrs = dict(unit = 'm3/m3',
                  title = "SMAP-HydroBlocks Surface Soil Moisture Data (m3/m3)",
-                 description = 'SMAP-HydroBlocks (SMAP-HB) is a 30-m hyper-resolution satellite-based surface soil moisture product (2015-2019). The dataset combines NASA Soil Moisture Active-Passive (SMAP) L3 Enhance product, hyper-resolution land surface modeling, radiative transfer modeling, machine learning, and in-situ observations. This subset was mapped to geographic coordinates at %i-m %s resolution.' % (final_spatial_resolution, final_temporal_resolution),
+                 description = 'SMAP-HydroBlocks (SMAP-HB) is a 30-m hyper-resolution satellite-based surface soil moisture product (2015-2019). The dataset combines NASA Soil Moisture Active-Passive (SMAP) L3 Enhance product, hyper-resolution land surface modeling, radiative transfer modeling, machine learning, and in-situ observations. This subset was mapped to %i-m %s resolution using geographic coordinates and Plate Carrée projection.' % (final_spatial_resolution, final_temporal_resolution),
                  creator_name = "Noemi Vergopolan (noemi@princeton.edu)",
                  institution = 'Princeton University',
                  citation = "Vergopolan et al. (2021). SMAP-HydroBlocks, a 30-m satellite-based soil moisture dataset for the conterminous US. Scientific Data, 8, 264. https://doi.org/10.1038/s41597-021-01050-2",
@@ -128,7 +128,8 @@ def create_zarr_template(final_path, variable, lats, lons, final_spatial_resolut
     os.system('rm -rf %s' % (final_path))
     zarr_compressor = zarr.Blosc(cname="zstd", clevel=compression_level, shuffle=1)
     zarr_encoding = { variable    : {'_FillValue': -9999,
-                                    'compressor': zarr_compressor},
+                                    'compressor': zarr_compressor,
+                                    'chunks': (chunk['time'],chunk['lat'],chunk['lon'])},
                                     'time': {'dtype': 'i4'},
                     }
     template.to_zarr(final_path, encoding=zarr_encoding, compute=False, consolidated=True, mode='w')
@@ -387,8 +388,10 @@ def get_bounds_from_centers(array_centers, delta=None):
 def subset_zarr_into_netcdf_groups(final_path,final_temporal_resolution):
     ds = xr.open_zarr(final_path)
     if final_temporal_resolution in ['6h','daily']:
-        index = ds.time.dt.strftime('%m-%Y')
-    elif final_temporal_resolution in ['monthly','annual']:
+        index = ds.time.dt.strftime('%Y-%m-%d')
+    elif final_temporal_resolution in ['monthly']:
+        index = ds.time.dt.strftime('%Y-%m')
+    elif final_temporal_resolution in ['annual']:
         index = ds.time.dt.strftime('%Y')
     dates, sub_datasets = zip(*ds.groupby(index))
     paths = ['%s_%s.nc' % (final_path, d) for d in dates]
@@ -396,19 +399,22 @@ def subset_zarr_into_netcdf_groups(final_path,final_temporal_resolution):
 
 def write_groups_into_netcdf_files(sub_datasets, paths, compression_level, chunk):
     
-    chunk['time'] = int(np.ceil(chunk['time']/10.))
-    netcdf_encoding = {'SMAPHB_SM' : {'_FillValue': -9999,
-                                   'complevel': compression_level, # Output data compression level:
+    for dataset, path in zip(sub_datasets, paths):
+        chunk['time'] = len(dataset.time)
+        netcdf_encoding = {'SMAPHB_SM' : {'_FillValue': -9999,
+                                          'complevel': compression_level, # Output data compression level:
                                                 #  [0] No compression (fast)
                                                 #  [9] max compression (slow)
-                                   'zlib': True,
-                                  },
+                                         'zlib': True,
+                                         'chunksizes': (chunk['time'],chunk['lat'],chunk['lon']),
+                                        },
                         'time': {'dtype': 'i4'},
                         }
-
-    for dataset, path in zip(sub_datasets, paths):
-        dataset = dataset.chunk(chunk)
-        dataset.to_netcdf(path, encoding=netcdf_encoding, engine="netcdf4")
+        for var in dataset:
+            del dataset[var].encoding['chunks']
+            del dataset[var].encoding['preferred_chunks']
+        #dataset = dataset.chunk(chunk)
+        dataset.to_netcdf(path, encoding=netcdf_encoding, format='NETCDF4', engine="netcdf4")
 
     return
 
@@ -435,6 +441,8 @@ def retrieve_data(database_path,
     else:
         rank=0
         size=1
+
+    if rank == 0: print(datetime.datetime.now(), 'Start', nregions, flush=True)
 
     # Retrive time arrays
     times, ag_times = retrive_time_stepping(database_path, start_date, end_date, final_temporal_resolution)
@@ -509,7 +517,7 @@ def retrieve_data(database_path,
                                                    lat_range, lon_range, lat_delta, lon_delta)
 
         # Loop through dates and save final file
-        #print(datetime.datetime.now(), 'domain:', r, 'computing...',flush=True)
+        print(datetime.datetime.now(), 'domain:', r, 'computing...',flush=True)
         for time_slice, time_range in zip(regions['time_slice'],regions['time_range']):
 
 
@@ -540,12 +548,16 @@ def retrieve_data(database_path,
     # Save netcdf output
     if output_format == 'netcdf' or output_format == 'both':
         sub_datasets, paths = subset_zarr_into_netcdf_groups(final_path,final_temporal_resolution)
+        if rank == 0: print(datetime.datetime.now(),'Writting %i NetCDF files' % len(paths),flush=True)
         write_groups_into_netcdf_files(sub_datasets[rank::size], paths[rank::size], 
                                        compression_level, original_chunks)
         del sub_datasets, paths
         if mpi_run: comm.Barrier()
-        if rank == 0 and output_format == 'netcdf': 
-            os.system('rm -rf %s' % final_path)
+        if rank == 0:
+            os.system('mkdir %s.netcdf' % final_path)
+            os.system('mv %s/*.nc %s.netcdf/' % (output_folder,final_path))
+            if output_format == 'netcdf': 
+                os.system('rm -rf %s' % final_path)
 
     # Save zarr output
     if output_format == 'zarr' or output_format == 'both':
