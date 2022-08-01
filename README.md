@@ -3,25 +3,34 @@
 
 # Usage
 
-1. Clone this repository
+### 1. Clone this repository
 ```
 git clone https://github.com/NoemiVergopolan/SMAP-HydroBlocks_postprocessing.git
 cd SMAP-HydroBlocks_postprocessing
 ```
 
-2. Download the SMAP-HydroBlocks Database from https://doi.org/10.5281/zenodo.5206725 and unzip it
- ```
- wget https://zenodo.org/record/5206725/files/SMAP-HB_hru_6h.zip
- unzip SMAP-HB_hru_6h.zip
- ```
+### 2. Download the SMAP-HydroBlocks Database from https://doi.org/10.5281/zenodo.5206725 and unzip it
+```
+wget https://zenodo.org/record/5206725/files/SMAP-HB_hru_6h.zip
+unzip SMAP-HB_hru_6h.zip
+```
 
-3. Create an anaconda environment
+### 3. Create an anaconda environment
+
+Option 1 – Create a conda environment from the yml file
 ```
 conda env create --name mapping -f yml/github/environment.yml
 source activate mapping
 ```
 
-4. Run the script
+Option 2 – Create a conda environment yourself:
+```
+conda create -n mapping -y
+source activate mapping
+conda install -c conda-forge numpy xarray rasterio pandas dask netcdf4 zarr mpi4py xesmf
+```
+
+### 4. Run the script
 ```
 python ./SMAPHB_hru2grid.py
 ```
