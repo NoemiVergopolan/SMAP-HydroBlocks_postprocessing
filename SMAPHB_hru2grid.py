@@ -1,44 +1,37 @@
 #!/usr/bin/env python
 # coding: utf-8
-
+#
 # Author: Noemi Vergopolan - Princeton University
 # Contact: noemi@princeton.edu, noemi.v.rocha@gmail.com
-# Last Update: Arpil 1st, 2022
+# Webpage: www.waterai.earth/smaphb
+#
+# Software last Update: 
+#
+#       April 1st, 2022
+#
 #
 # Summary:
 #
 #      This script post-process the SMAP-HydroBlocks dataset from the Hydrological Response Unit (HRU) space
 #      into the geographically gridded space. The final domain extent, temporal coverage, and temporal resolution
 #      are user-defined parameters. The data uses a Plate Carrée projection and can be output as Zarr storage
-#      (recommended) or NetCDF files. Both can be open with python libraries such as xarrays.
-#
-# Usage:
-#
-#      1. Download the SMAP-HydroBlocks Database: wget https://zenodo.org/record/5206725/files/SMAP-HB_hru_6h.zip
-#      2. Unzip the file: unzip SMAP-HB_hru_6h.zip
-#      3. Create environemnt: conda env create --name remapping -f yml/default/environment.yml
-#      4. Load environment: source activate remapping
-#      3. Run: python ./SMAPHB_hru2grid.py
-#
-# Note:
-#      SMAP-HydroBlocks is a very big dataset. If remapped entirely it comprises>122 TB of NetCDF data. To reduce
-#      data storage and improve data access, outputting the data in Zarr format is recommended.
-#      This script allows for subsetting and postprocessing this dataset according to the user's needs and resources.
-#      For example, SMAP-HydroBlocks mapped to a 30-meter daily resolution, at ~ 50km x 50km domain, for a 1 year
-#      period, with maximum compression [option 9], is expected to output 786 MB of NetCDF files or 656 MB of Zarr
-#      storage. As such, please keep in mind that the domain extent, time period, temporal resolution, and compression
-#      option selected will determine runtime and data storage
+#      (recommended) or NetCDF files. Both can be open with python libraries such as xarrays. Please see the 
+#      README.md for library instalation and usaga notes.
 #
 #
 # Reference:
 #
-#       Please cite the following paper when using the dataset in any publication:
+#       Please refer to the following paper when using the dataset in any publication:
+#
 #       Vergopolan, N., Chaney, N. W., Beck, H. E., Pan, M., Sheffield, J., Chan, S., & Wood, E. F. (2020).
 #             Combining hyper-resolution land surface modeling with SMAP brightness temperatures to
 #             obtain 30-m soil moisture estimates. Remote Sensing of Environment, 242, 111740.
 #             https://doi.org/10.1016/j.rse.2020.111740
 #
-
+#       Vergopolan, N., Chaney, N.W., Pan, M. et al. (2021). SMAP-HydroBlocks, a 30-m satellite-based soil 
+#             moisture dataset for the conterminous US. Sci Data 8, 264.
+#             https://doi.org/10.1038/s41597-021-01050-2
+#
 
 # Load libraries needed
 import os
@@ -76,7 +69,7 @@ final_temporal_resolution = 'daily'
 final_spatial_resolution = 30   # meters
 
 # 8. Set the output data compression level [0-9]. More compression saves storage but will slow down data procressing.
-compression_level = 9
+compression_level = 5
 
 # The remapping can be performed in parallel with mpi_run = True and:
 # 'mpirun -np <number of processes> python SMAPHB_hru2grid.py'
