@@ -373,7 +373,7 @@ def define_regrid_information(final_spatial_resolution, r, region_lats, region_l
             import xesmf as xe
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
-                regridder = xe.Regridder(grid_in, grid_out, 'conservative', reuse_weights=True)
+                regridder = xe.Regridder(grid_in, grid_out, 'conservative', reuse_weights=False)
                 spatial_regrid['regridder'] = regridder
 
     return spatial_regrid
@@ -406,14 +406,14 @@ def write_groups_into_netcdf_files(sub_datasets, paths, compression_level, chunk
                                                 #  [0] No compression (fast)
                                                 #  [9] max compression (slow)
                                          'zlib': True,
-                                         'chunksizes': (chunk['time'],chunk['lat'],chunk['lon']),
+                                         #'chunksizes': (chunk['time'],chunk['lat'],chunk['lon']),
                                         },
                         'time': {'dtype': 'i4'},
                         }
         for var in dataset:
             del dataset[var].encoding['chunks']
             del dataset[var].encoding['preferred_chunks']
-        #dataset = dataset.chunk(chunk)
+        dataset = dataset.chunk(chunk)
         dataset.to_netcdf(path, encoding=netcdf_encoding, format='NETCDF4', engine="netcdf4")
 
     return
