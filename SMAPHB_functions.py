@@ -567,6 +567,6 @@ def retrieve_data(database_path,
             os.system('mv %s %s' % (final_path, final_file))
 
     if mpi_run: comm.Barrier()
-    if rank == 0: print(datetime.datetime.now(),'Complete',flush=True)
+    if rank == 0: print(datetime.datetime.now(),'Completed',flush=True)
 
     return
