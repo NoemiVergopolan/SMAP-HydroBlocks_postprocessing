@@ -387,9 +387,9 @@ def get_bounds_from_centers(array_centers, delta=None):
 
 def subset_zarr_into_netcdf_groups(final_path,final_temporal_resolution):
     ds = xr.open_zarr(final_path)
-    if final_temporal_resolution in ['6h','daily']:
-        index = ds.time.dt.strftime('%Y-%m-%d')
-    elif final_temporal_resolution in ['monthly']:
+    #if final_temporal_resolution in ['6h']:
+    #    index = ds.time.dt.strftime('%Y-%m-%d')
+    if final_temporal_resolution in ['6h','daily','monthly']:
         index = ds.time.dt.strftime('%Y-%m')
     elif final_temporal_resolution in ['annual']:
         index = ds.time.dt.strftime('%Y')
@@ -442,7 +442,7 @@ def retrieve_data(database_path,
         rank=0
         size=1
 
-    if rank == 0: print(datetime.datetime.now(), 'Start', nregions, flush=True)
+    if rank == 0: print(datetime.datetime.now(), 'Start', flush=True)
 
     # Retrive time arrays
     times, ag_times = retrive_time_stepping(database_path, start_date, end_date, final_temporal_resolution)
