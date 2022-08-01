@@ -26,7 +26,7 @@ source activate mapping
 python ./SMAPHB_hru2grid.py
 ```
 
-Edit the ```SMAPHB_hru2grid.py``` script to change the desired spatial extent, time period, time resolution, data format, compression level, output file name, etc.
+Gridded SMAP-HydroBlocks data will be saved on ```SMAPHB_sample``` folder. Please eEdit the ```SMAPHB_hru2grid.py``` script to change the desired spatial extent, time period, time resolution, data format, compression level, output file and folder name, etc.
 
 
 
