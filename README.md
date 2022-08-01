@@ -1,5 +1,5 @@
 # Summary
-[SMAP-HydroBlocks (SMAP-HB)](https://waterai.earth/smaphb/) is a hyper-resolution satellite-based surface soil moisture product that combines NASA's Soil Moisture Active-Passive (SMAP) L3 Enhance product, hyper-resolution land surface modeling, radiative transfer modeling, machine learning, and in-situ observations. This dataset reports the surface soil moisture (top 5-cm of the soil layer) in volumetric unit (m3/m3). Data is available across the continental United States at an effective 30-m spatial resolution (2015–2019). Retrievals are organized 6h, but are only reported at the time of SMAP retrieval. This script post-process the SMAP-HydroBlocks dataset from the Hydrological Response Unit (HRU) space (time, hru) into the geographically gridded space (time, latitude, longitude) using a Plate Carrée projection. Data can be output in Zarr and/or netCDF4 format. 
+[SMAP-HydroBlocks (SMAP-HB)](https://waterai.earth/smaphb/) is a hyper-resolution satellite-based surface soil moisture product that combines NASA's Soil Moisture Active-Passive (SMAP) L3 Enhance product, hyper-resolution land surface modeling, radiative transfer modeling, machine learning, and in-situ observations. This dataset reports the surface soil moisture (top 5-cm of the soil layer) in volumetric unit (m3/m3). Data is available across the continental United States at an effective 30-m spatial resolution (2015–2019). Retrievals are organized 6h, but are only reported at the time of SMAP retrieval. This script post-process the SMAP-HydroBlocks dataset from the Hydrological Response Unit (HRU) space (time, hru) into the geographically gridded space (time, latitude, longitude) using the Plate Carrée projection. Data can be output in Zarr and/or netCDF4 format. 
 
 # Usage
 
@@ -26,7 +26,7 @@ source activate mapping
 python ./SMAPHB_hru2grid.py
 ```
 
-Gridded SMAP-HydroBlocks data will be saved on ```SMAPHB_sample``` folder. Please eEdit the ```SMAPHB_hru2grid.py``` script to change the desired spatial extent, time period, time resolution, data format, compression level, output file and folder name, etc.
+Gridded SMAP-HydroBlocks data will be saved on ```SMAPHB_sample``` folder. Please edit the ```SMAPHB_hru2grid.py``` script to change the desired spatial extent, time period, time resolution, data format, compression level, output file and folder name, etc.
 
 
 
