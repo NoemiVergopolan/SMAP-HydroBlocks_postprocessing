@@ -47,7 +47,7 @@ mpirun -np <number of processes> python ./SMAPHB_hru2grid.py
 
 
 ### Support for remapping to coarser spatial resolutions
-There is an experimental feature that allows remapping the SMAP-HydroBlocks data to a coarser spatial resolution than its original 30-m resolution. This feature uses the python xESMF library, which does not provide MPI parallel support at the moment. To remap SMAP-HydroBlocks 30-m data to a coarse spatial resolution, please edit ```SMAPHB_hru2grid.py``` and set ```mpi_run = False``` and  ```final_spatial_resolution = <desire resolution in meters>```. Run the script as:
+There is an experimental feature that allows remapping the SMAP-HydroBlocks data at 30-m resolution to a coarser spatial resolution (e.g., 100m, 500m, 1000m, etc.). This feature relies on the xESMF library, which currently does not provide MPI parallel support. Thus, to remap SMAP-HydroBlocks data to a coarse spatial resolution, please edit ```SMAPHB_hru2grid.py``` and set ```mpi_run = False``` and  ```final_spatial_resolution = <desire resolution in meters>```. Run the script as:
 ```
 python ./SMAPHB_hru2grid.py
 ```
