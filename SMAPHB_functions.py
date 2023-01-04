@@ -554,8 +554,8 @@ def retrieve_data(database_path,
         del sub_datasets, paths
         if mpi_run: comm.Barrier()
         if rank == 0:
-            os.system('mkdir %s.netcdf' % final_path)
-            os.system('mv %s/*.nc %s.netcdf/' % (output_folder,final_path))
+            os.system('mkdir %s_netcdf' % final_path)
+            os.system('mv %s/*.nc %s_netcdf/' % (output_folder,final_path))
             if output_format == 'netcdf': 
                 os.system('rm -rf %s' % final_path)
 
