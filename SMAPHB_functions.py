@@ -125,7 +125,7 @@ def create_zarr_template(final_path, variable, lats, lons, final_spatial_resolut
     template = template.assign_attrs(attrs)
 
     # Create zarr template on the disk
-    os.system('rm -rf %s' % (final_path))
+    os.system('rm -rf %s/*' % (final_path))
     zarr_compressor = zarr.Blosc(cname="zstd", clevel=compression_level, shuffle=1)
     zarr_encoding = { variable    : {'_FillValue': -9999,
                                     'compressor': zarr_compressor,
@@ -554,7 +554,7 @@ def retrieve_data(database_path,
         del sub_datasets, paths
         if mpi_run: comm.Barrier()
         if rank == 0:
-            os.system('mkdir %s_netcdf' % final_path)
+            os.system('mkdir -p %s_netcdf' % final_path)
             os.system('mv %s/*.nc %s_netcdf/' % (output_folder,final_path))
             if output_format == 'netcdf': 
                 os.system('rm -rf %s' % final_path)
