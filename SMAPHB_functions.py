@@ -10,6 +10,7 @@ import gc
 import dask.array as da
 import zarr
 from itertools import product
+import rioxarray
 
 # Hopes that it helps minimize memory leak when open and reading many netcdf files
 # It limits the number of files that can be simultaneously opened
@@ -182,12 +183,12 @@ def open_mosaic_object(database_path, minlat, maxlat, minlon, maxlon):
     if maxlon < minlon: sys.exit('minlon and maxlon inputs may be inverted!')
 
     # Read the catchments and HRU maps
-    catch_map = xr.open_rasterio(filename = '%s/mapping_catchments/all_catchments.vrt' % database_path,
+    catch_map = rioxarray.open_rasterio(filename = '%s/mapping_catchments/all_catchments.vrt' % database_path,
                                  chunks   = {'x': 1000, 'y': 1000})
     catch_map = catch_map.sel(x=slice(minlon,maxlon),y=slice(maxlat,minlat))
     catch_map = catch_map.sel(band=1)
 
-    hru_map = xr.open_rasterio(filename ='%s/mapping_hrus/all_hrus.vrt' % database_path,
+    hru_map = rioxarray.open_rasterio(filename ='%s/mapping_hrus/all_hrus.vrt' % database_path,
                                chunks   = {'x': 1000, 'y': 1000})
     hru_map = hru_map.sel(x=slice(minlon,maxlon),y=slice(maxlat,minlat))
     hru_map = hru_map.sel(band=1)

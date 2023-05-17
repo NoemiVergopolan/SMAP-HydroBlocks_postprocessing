@@ -27,7 +27,7 @@ Option 2 – Create a conda environment yourself:
 ```
 conda create -n mapping -y
 source activate mapping
-conda install -c conda-forge numpy xarray rasterio pandas dask netcdf4 zarr mpi4py xesmf esmpy
+conda install -c conda-forge numpy xarray rioxarray pandas dask netcdf4 zarr mpi4py xesmf esmpy
 ```
 
 ### 4. Run the script
