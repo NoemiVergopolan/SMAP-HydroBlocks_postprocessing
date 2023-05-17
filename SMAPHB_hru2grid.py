@@ -7,7 +7,7 @@
 #
 # Software last Update: 
 #
-#       August 1st, 2022
+#       May 17th, 2023
 #
 #
 # Summary:
@@ -23,14 +23,14 @@
 #
 #       Please refer to the following paper when using the dataset in any publication:
 #
+#       Vergopolan, N., Chaney, N.W., Pan, M. et al. (2021). SMAP-HydroBlocks, a 30-m satellite-based soil
+#             moisture dataset for the conterminous US. Sci Data 8, 264.
+#             https://doi.org/10.1038/s41597-021-01050-2
+#
 #       Vergopolan, N., Chaney, N. W., Beck, H. E., Pan, M., Sheffield, J., Chan, S., & Wood, E. F. (2020).
 #             Combining hyper-resolution land surface modeling with SMAP brightness temperatures to
 #             obtain 30-m soil moisture estimates. Remote Sensing of Environment, 242, 111740.
 #             https://doi.org/10.1016/j.rse.2020.111740
-#
-#       Vergopolan, N., Chaney, N.W., Pan, M. et al. (2021). SMAP-HydroBlocks, a 30-m satellite-based soil 
-#             moisture dataset for the conterminous US. Sci Data 8, 264.
-#             https://doi.org/10.1038/s41597-021-01050-2
 #
 
 # Load libraries needed
