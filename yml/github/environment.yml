@@ -4,7 +4,7 @@ channels:
   - defaults
 dependencies:
   - pandas
-  - rasterio
+  - rioxarray
   - mpi4py
   - xesmf
   - esmpy
