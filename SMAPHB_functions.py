@@ -313,7 +313,12 @@ def map_data(database_path, variable,
         with warnings.catch_warnings():
                 warnings.simplefilter("ignore") 
                 regridder = spatial_regrid['regridder']
-                final_map_xr = regridder(final_map_xr)
+                final_map_xr = regridder(final_map_xr, 
+                                         skipna=True,
+                                         # na_thres controls how much percent of the data needs to be valid to compute the spatial mean of a grid.
+                                         # For example, 1.0 will only regrid domains with 100% of data coverage, 0.5 will regrid where there is at least 50% of valid data in the grid.
+                                         na_thres=0.25,  
+                                         )
                 final_map_xr = final_map_xr.reindex(lat=final_map_xr.lat[::-1])
 
     elif final_spatial_resolution < 30:
@@ -374,6 +379,7 @@ def define_regrid_information(final_spatial_resolution, r, region_lats, region_l
             import xesmf as xe
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
+
                 regridder = xe.Regridder(grid_in, grid_out, 'conservative', reuse_weights=False)
                 spatial_regrid['regridder'] = regridder
 
