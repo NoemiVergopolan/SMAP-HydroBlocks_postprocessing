@@ -9,13 +9,24 @@ import warnings
 import gc
 import dask.array as da
 import zarr
+from numcodecs import Blosc
 from itertools import product
 import rioxarray
+import platform
 
 # Hopes that it helps minimize memory leak when open and reading many netcdf files
 # It limits the number of files that can be simultaneously opened
 xr.set_options(file_cache_maxsize=1)
 
+def is_windows():
+    return platform.system() == 'Windows'
+
+def is_unix():
+    return platform.system() in ('Linux', 'Darwin')  # Darwin is macOS
+
+if is_windows():
+    from numcodecs import Blosc
+    import glob
 
 def retrive_time_stepping(database_path, start_date, end_date, final_temporal_resolution):
 
@@ -61,10 +72,10 @@ def update_latlon_to_new_spatial_resolution(final_spatial_resolution, lats, lons
         ag_delta_lon = lon_delta*final_spatial_resolution/data_res
         ag_delta_lon_half = ag_delta_lon/2.0
 
-        ilat = lats[0]  -lat_delta_half
-        flat = lats[-1] +lat_delta_half
-        ilon = lons[0]  -lon_delta_half
-        flon = lons[-1] +lon_delta_half
+        ilat = lats[0]  - lat_delta_half
+        flat = lats[-1] + lat_delta_half
+        ilon = lons[0]  - lon_delta_half
+        flon = lons[-1] + lon_delta_half
 
         n_ag_lats = int(np.ceil((flat-ilat)/ag_delta_lat))
         n_ag_lons = int(np.ceil((flon-ilon)/ag_delta_lon))
@@ -80,8 +91,8 @@ def update_latlon_to_new_spatial_resolution(final_spatial_resolution, lats, lons
 
     return ag_lats, ag_lons, ag_delta_lat, ag_delta_lon
 
-def update_chunks_to_new_spatial_resolution(final_spatial_resolution,chunk):
-    data_res = 27.7777777 # meters
+def update_chunks_to_new_spatial_resolution(final_spatial_resolution, chunk):
+    data_res = 27.7777777  # meters
     if final_spatial_resolution == 30:
         pass
     else:
@@ -103,7 +114,7 @@ def create_zarr_template(final_path, variable, lats, lons, final_spatial_resolut
                             dims=["time", "lat", "lon"])
     template = template.to_dataset(name=variable)
 
-    # Defin e and rechunk data
+    # Define and rechunk data
     template = template.chunk(chunk)
 
     # Grab chunk ranges
@@ -112,28 +123,33 @@ def create_zarr_template(final_path, variable, lats, lons, final_spatial_resolut
     ctimes = template.chunks['time']
 
     # Double chunk in time
-    chunk['time'] = int(np.ceil(chunk['time']/10.))
+    chunk['time'] = int(np.ceil(chunk['time']/10.0))
     template = template.chunk(chunk)
     
-    # Define atributes
+    # Define attributes
     attrs = dict(unit = 'm3/m3',
                  title = "SMAP-HydroBlocks Surface Soil Moisture Data (m3/m3)",
                  description = 'SMAP-HydroBlocks (SMAP-HB) is a 30-m hyper-resolution satellite-based surface soil moisture product (2015-2019). The dataset combines NASA Soil Moisture Active-Passive (SMAP) L3 Enhance product, hyper-resolution land surface modeling, radiative transfer modeling, machine learning, and in-situ observations. This subset was mapped to %i-m %s resolution using geographic coordinates and Plate Carrée projection.' % (final_spatial_resolution, final_temporal_resolution),
-                 creator_name = "Noemi Vergopolan (noemi@princeton.edu)",
-                 institution = 'Princeton University',
+                 creator_name = "Noemi Vergopolan (noemi.vergopolan@rice.edu)",
+                 institution = 'Rice University',
                  citation = "Vergopolan et al. (2021). SMAP-HydroBlocks, a 30-m satellite-based soil moisture dataset for the conterminous US. Scientific Data, 8, 264. https://doi.org/10.1038/s41597-021-01050-2",
                  )
     template = template.assign_attrs(attrs)
 
     # Create zarr template on the disk
-    os.system('rm -rf %s/*' % (final_path))
-    zarr_compressor = zarr.Blosc(cname="zstd", clevel=compression_level, shuffle=1)
+    if is_windows():
+        os.remove(final_path)
+    else:
+        os.system('rm -rf %s/*' % (final_path))
+
+    
+    zarr_compressor = Blosc(cname="zstd", clevel=compression_level, shuffle=1)
     zarr_encoding = { variable    : {'_FillValue': -9999,
-                                    'compressor': zarr_compressor,
-                                    'chunks': (chunk['time'],chunk['lat'],chunk['lon'])},
+                                    'compressors': zarr_compressor,
+                                    'chunks': (chunk['time'], chunk['lat'], chunk['lon'])},
                                     'time': {'dtype': 'i4'},
                     }
-    template.to_zarr(final_path, encoding=zarr_encoding, compute=False, consolidated=True, mode='w')
+    template.to_zarr(final_path, encoding=zarr_encoding, compute=False, consolidated=True, mode='w', zarr_format=2)
     print(datetime.datetime.now(), 'Data template is ready', flush=True)
 
     template.close()
@@ -449,20 +465,23 @@ def retrieve_data(database_path,
         rank=0
         size=1
 
+    if os.path.exists(database_path) == False:
+        sys.exit('Error: database_path not found!')
+
     if rank == 0: print(datetime.datetime.now(), 'Start', flush=True)
 
-    # Retrive time arrays
+    # Retrieve time arrays
     times, ag_times = retrive_time_stepping(database_path, start_date, end_date, final_temporal_resolution)
 
-    # Retrievel HRU mapping and lat lon arrays
+    # Retrieve HRU mapping and lat lon arrays
     catch_map, hru_map = open_mosaic_object(database_path, minlat, maxlat, minlon, maxlon)
     lats = catch_map.y.values
     lons = catch_map.x.values
 
-    # get lat lons and deltas
+    # get lats/lons and deltas
     lats, lons, lat_delta, lon_delta = update_latlon_to_new_spatial_resolution(final_spatial_resolution, lats, lons)
 
-    # If data is output at corser spatial resolution, update the lat lon arrays
+    # If final data is output at corser spatial resolution, update the lat lon arrays
     if  final_spatial_resolution != 30 :
         catch_map, hru_map = open_mosaic_object(database_path, lats[0] -lat_delta/2.0, 
                                                                lats[-1]+lat_delta/2.0,
@@ -500,7 +519,8 @@ def retrieve_data(database_path,
     regions_range_elements = list(product(regions['lat_range'], regions['lon_range']))
     regions_slice_elements = list(product(regions['lat_slice'], regions['lon_slice']))
     nregions = len(regions_slice_elements)
-    if rank == 0: print(datetime.datetime.now(), 'total sub-domains to work on:', nregions, flush=True) 
+    if rank == 0:
+        print(datetime.datetime.now(), 'total sub-domains to work on:', nregions, flush=True)
 
     # Loop over the regions
     for r in np.arange(nregions)[rank::size]:
@@ -545,12 +565,22 @@ def retrieve_data(database_path,
                 region_map.close()
                 del region_map
     
+        # Remove xESMF temporary files
         if final_spatial_resolution > 30:
-            os.system('rm -rf conservative_*.nc') 
-
+            if is_windows():
+                temp_files = glob.glob("conservative_*.nc")
+                for f in temp_files:
+                    try:
+                        os.remove(f)
+                    except OSError:
+                        pass
+            else:
+                os.system('rm -rf conservative_*.nc') 
+            
     hru_map.close()
     del catch_map, hru_map
-    if mpi_run: comm.Barrier()
+    if mpi_run:
+        comm.Barrier()
 
     # Save netcdf output
     if output_format == 'netcdf' or output_format == 'both':
@@ -559,7 +589,8 @@ def retrieve_data(database_path,
         write_groups_into_netcdf_files(sub_datasets[rank::size], paths[rank::size], 
                                        compression_level, original_chunks)
         del sub_datasets, paths
-        if mpi_run: comm.Barrier()
+        if mpi_run:
+            comm.Barrier()
         if rank == 0:
             os.system('mkdir -p %s_netcdf' % final_path)
             os.system('mv %s/*.nc %s_netcdf/' % (output_folder,final_path))
@@ -573,7 +604,9 @@ def retrieve_data(database_path,
             os.system('rm -rf %s' % (final_file))
             os.system('mv %s %s' % (final_path, final_file))
 
-    if mpi_run: comm.Barrier()
-    if rank == 0: print(datetime.datetime.now(),'Completed',flush=True)
+    if mpi_run:
+        comm.Barrier()
+    if rank == 0: 
+        print(datetime.datetime.now(),'Completed',flush=True)
 
     return

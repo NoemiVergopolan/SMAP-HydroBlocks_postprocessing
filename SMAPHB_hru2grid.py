@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
 #
-# Author: Noemi Vergopolan - Princeton University
-# Contact: noemi@princeton.edu, noemi.v.rocha@gmail.com
+# Author: Noemi Vergopolan - Rice University
+# Contact: vergopolan@rice.edu
 # Webpage: www.waterai.earth/smaphb
 #
 # Software last Update: 
 #
-#       May 17th, 2023
+#       April 11th, 2025
 #
 #
 # Summary:

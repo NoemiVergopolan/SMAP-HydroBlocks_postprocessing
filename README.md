@@ -19,14 +19,14 @@ unzip SMAP-HB_hru_6h.zip
 
 Option 1 – Create a conda environment from the yml file
 ```
-conda env create --name mapping -f yml/github/environment.yml
-source activate mapping
+conda env create --name SMAPHB -f yml/github/environment.yml
+source activate SMAPHB
 ```
 
 Option 2 – Create a conda environment yourself:
 ```
-conda create -n mapping -y
-source activate mapping
+conda create -n SMAPHB -y
+source activate SMAPHB
 conda install -c conda-forge numpy xarray rioxarray pandas dask netcdf4 zarr mpi4py xesmf esmpy
 ```
 
@@ -60,12 +60,11 @@ SMAP-HydroBlocks is a very big dataset. If remapped entirely at a daily scale co
 
 Please cite the following paper when using the dataset in any publication:
 
-Vergopolan, N., Chaney, N. W., Beck, H. E., Pan, M., Sheffield, J., Chan, S., & Wood, E. F. (2020). Combining hyper-resolution land surface modeling with SMAP brightness temperatures to obtain 30-m soil moisture estimates. Remote Sensing of Environment, 242, 111740. https://doi.org/10.1016/j.rse.2020.111740
+Vergopolan, N. et al. SMAP-HydroBlocks, a 30-m satellite-based soil moisture dataset for the conterminous US. Sci Data 8, 264 (2021). https://doi.org/10.1038/s41597-021-01050-2
 
-Vergopolan, N., Chaney, N.W., Pan, M. et al. SMAP-HydroBlocks, a 30-m satellite-based soil moisture dataset for the conterminous US. Sci Data 8, 264 (2021). https://doi.org/10.1038/s41597-021-01050-2
 
 
 # Contact
- - Noemi Vergopolan, Princeton University
+ - Dr. Noemi Vergopolan, Rice University
  - Website: www.waterai.earth/smaphb
- - Email: noemi@princeton.edu
+ - Email: vergopolan@rice.edu
