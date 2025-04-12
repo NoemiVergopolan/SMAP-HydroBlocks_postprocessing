@@ -1,5 +1,6 @@
 import os
 import sys
+import shutil
 import numpy as np
 import xarray as xr
 from pandas import Series as pd_Series
@@ -12,21 +13,27 @@ import zarr
 from numcodecs import Blosc
 from itertools import product
 import rioxarray
-import platform
+import glob
 
 # Hopes that it helps minimize memory leak when open and reading many netcdf files
 # It limits the number of files that can be simultaneously opened
 xr.set_options(file_cache_maxsize=1)
 
-def is_windows():
-    return platform.system() == 'Windows'
 
-def is_unix():
-    return platform.system() in ('Linux', 'Darwin')  # Darwin is macOS
-
-if is_windows():
-    from numcodecs import Blosc
-    import glob
+def clear_path(path_pattern):
+    paths = glob.glob(path_pattern)
+    for path in paths:
+        if os.path.isfile(path) or os.path.islink(path):
+            os.remove(path)
+        elif os.path.isdir(path):
+            for filename in os.listdir(path):
+                file_path = os.path.join(path, filename)
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.remove(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            shutil.rmtree(path)
+    return
 
 def retrive_time_stepping(database_path, start_date, end_date, final_temporal_resolution):
 
@@ -137,10 +144,7 @@ def create_zarr_template(final_path, variable, lats, lons, final_spatial_resolut
     template = template.assign_attrs(attrs)
 
     # Create zarr template on the disk
-    if is_windows():
-        os.remove(final_path)
-    else:
-        os.system('rm -rf %s/*' % (final_path))
+    clear_path(final_path)
 
     
     zarr_compressor = Blosc(cname="zstd", clevel=compression_level, shuffle=1)
@@ -567,15 +571,7 @@ def retrieve_data(database_path,
     
         # Remove xESMF temporary files
         if final_spatial_resolution > 30:
-            if is_windows():
-                temp_files = glob.glob("conservative_*.nc")
-                for f in temp_files:
-                    try:
-                        os.remove(f)
-                    except OSError:
-                        pass
-            else:
-                os.system('rm -rf conservative_*.nc') 
+            clear_path('conservative_*.nc')
             
     hru_map.close()
     del catch_map, hru_map
@@ -592,17 +588,19 @@ def retrieve_data(database_path,
         if mpi_run:
             comm.Barrier()
         if rank == 0:
-            os.system('mkdir -p %s_netcdf' % final_path)
-            os.system('mv %s/*.nc %s_netcdf/' % (output_folder,final_path))
+            target_dir = '%s_netcdf' % final_path
+            os.makedirs(target_dir, exist_ok=True)
+            nc_files = glob.glob(os.path.join(output_folder, '*.nc'))
+            for file_path in nc_files:
+                shutil.move(file_path, target_dir)
             if output_format == 'netcdf': 
-                os.system('rm -rf %s' % final_path)
+                clear_path(final_path)
 
     # Save zarr output
     if output_format == 'zarr' or output_format == 'both':
         if rank == 0:
             final_file = '%s.zarr' % final_path
-            os.system('rm -rf %s' % (final_file))
-            os.system('mv %s %s' % (final_path, final_file))
+            shutil.move(final_path, final_file)
 
     if mpi_run:
         comm.Barrier()
